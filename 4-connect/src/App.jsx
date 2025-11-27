@@ -17,7 +17,6 @@ function App() {
       function handleStart(){
           if (player === "O"){
               const depth = difficulty === "easy" ? 1 : 5;
-
               dispatch({ type: "USER_TURN", index: Math.floor(Math.random() * 4) * Math.floor(Math.random() * 4) });
           }
           console.log(player);
