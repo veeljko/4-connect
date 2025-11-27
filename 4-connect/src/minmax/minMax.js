@@ -9,7 +9,7 @@ function evaluate(board, botSymbol) {
     return 0;
 }
 
-function checkWinner(board) {
+export function checkWinner(board) {
     const N = 4;
 
     // Check rows
@@ -79,7 +79,7 @@ function minimax(board, depth, isMaximizing, botSymbol, cache = new Map()) {
     return best;
 }
 
-export function getBestMove(board, botSymbol = -1) {
+export function getBestMove(board, botSymbol = 1, depth = 5) {
     const N = 4;
     let bestScore = -Infinity;
     let move = null;
@@ -89,7 +89,7 @@ export function getBestMove(board, botSymbol = -1) {
         for (let c = 0; c < N; c++) {
             if (board[r][c] === 0) {
                 board[r][c] = botSymbol;
-                const score = minimax(board, 6, false, botSymbol, cache);
+                const score = minimax(board, depth, false, botSymbol, cache);
                 board[r][c] = 0;
                 if (score > bestScore) {
                     bestScore = score;

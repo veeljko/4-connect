@@ -1,8 +1,19 @@
 import ConnectCell from "./ConnectCell.jsx";
 import { useTableContext } from "../hooks/useTableContext.jsx";
+import {useEffect, useState} from "react";
 
-function ConnectTable() {
-    const { cells } = useTableContext();
+function ConnectTable({difficulty, player}) {
+    const { cells, dispatch } = useTableContext();
+    const [moveCount, setMoveCount] = useState(player === "X" ? 0 : 1);
+
+    useEffect(() => {
+        if (moveCount === 16) {
+            dispatch({
+                type: "RESET"
+            })
+            setMoveCount(0);
+        }
+    }, [moveCount])
 
     return (
         <table className="border-collapse border-2">
@@ -17,6 +28,9 @@ function ConnectTable() {
                                 indRow={r}
                                 indCol={c}
                                 cell={cell}
+                                setMoveCount={setMoveCount}
+                                difficulty={difficulty}
+                                player={player}
                             />
                         );
                     })}
