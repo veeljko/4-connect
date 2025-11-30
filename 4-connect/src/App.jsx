@@ -16,11 +16,11 @@ function App() {
       const [start, setStart] = useState(false);
       //
       function handleStart(){
+          console.log(player)
           if (player === "O"){
-              const depth = difficulty === "easy" ? 7 : 9;
+              const depth = difficulty === "easy" ? 5 : 7;
               const bestMove = getBestMove(board, depth);
               const botRes = dropPiece(board, bestMove, 2);
-              console.log(bestMove);
               setBoardView(prev => {
                   const newBoard = prev.map(row => [...row]);
                   newBoard[botRes][bestMove] = 2;
