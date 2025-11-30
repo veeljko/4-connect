@@ -1,5 +1,5 @@
 import FConnectCell from "./FConnectCell.jsx"
-import {createBoard} from "../minmax/minMac4Connect.js";
+import {createBoard} from "../minmax/minMaxFConnect.js";
 import {useEffect, useState} from "react";
 import {useScoreContext} from "../hooks/useScoreContext.jsx";
 

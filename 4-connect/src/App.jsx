@@ -3,9 +3,9 @@ import Score from "./components/Score.jsx";
 import DifficultySelector from "./components/DifficultySelector.jsx";
 import {useState} from "react";
 import ChoosePlayer from "./components/ChosePlayer.jsx";
-import {getBestMove} from "./minmax/minMac4Connect.js";
+import {getBestMove} from "./minmax/minMaxFConnect.js";
 import FConnectTable from "./components/FConnectTable.jsx";
-import {createBoard, dropPiece} from "./minmax/minMac4Connect.js";
+import {createBoard, dropPiece} from "./minmax/minMaxFConnect.js";
 
 function App() {
       const board = createBoard();

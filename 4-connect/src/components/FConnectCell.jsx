@@ -1,6 +1,6 @@
-import {dropPiece} from "../minmax/minMac4Connect.js";
-import {getBestMove} from "../minmax/minMac4Connect.js";
-import {winningMove} from "../minmax/minMac4Connect.js";
+import {dropPiece} from "../minmax/minMaxFConnect.js";
+import {getBestMove} from "../minmax/minMaxFConnect.js";
+import {winningMove} from "../minmax/minMaxFConnect.js";
 
 function FConnectCell({starterPlayer ,difficulty, indRow, indCol, boardView, setBoardView, setWinner}) {
     const depth = difficulty === "easy" ? 7 : 9;
@@ -48,18 +48,18 @@ function FConnectCell({starterPlayer ,difficulty, indRow, indCol, boardView, set
         {player === "BOT" ?
             <td className="bg-red-800 rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
             onClick={handleClick}>
-                <p></p>
+
             </td>
             :
         player === "PLAYER" ?
             <td className="bg-blue-800 rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
             onClick={handleClick}>
-                <p></p>
+
             </td>
         :
             <td className="bg-white rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
             onClick={handleClick}>
-                <p></p>
+
             </td>}
     </>);
 }
