@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 
 function ChoosePlayer({ player, setPlayer }) {
 
@@ -15,10 +15,10 @@ function ChoosePlayer({ player, setPlayer }) {
                     ${player === "X"
                     ? "bg-red-600 text-white"
                     : "bg-gray-200 text-gray-700"}
-                `}
+                h-10 w-10`}
                 onClick={() => handleSelect("X")}
             >
-                X
+
             </button>
 
             <button
@@ -26,10 +26,10 @@ function ChoosePlayer({ player, setPlayer }) {
                     ${player === "O"
                     ? "bg-blue-600 text-white"
                     : "bg-gray-200 text-gray-700"}
-                `}
+                h-10 w-10`}
                 onClick={() => handleSelect("O")}
             >
-                O
+
             </button>
         </div>
     );
