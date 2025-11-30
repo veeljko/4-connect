@@ -8,7 +8,7 @@ function DifficultySelector({ difficulty, setDifficulty }) {
 
     return (
         <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-md shadow-md justify-center">
-            <span className="font-semibold text-gray-700">Difficulty:</span>
+            {/*<span className="font-semibold text-gray-700">Difficulty:</span>*/}
             <button
                 className={`px-4 py-2 rounded-md font-medium ${
                     difficulty === "easy"
