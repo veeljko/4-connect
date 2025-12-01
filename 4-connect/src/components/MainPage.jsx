@@ -52,7 +52,7 @@ function MainPage(){
             </div>
             </>) : (<div className="flex flex-col">
                 <div className="flex justify-center mt-20  h-[300px] items-baseline">
-                    <FConnectTable boardView={boardView} setBoardView={setBoardView} starterPlayer={player} />
+                    <FConnectTable boardView={boardView} setBoardView={setBoardView} />
                 </div>
                 {(state.isP1Winner || state.isP2Winner) && (
                     <button

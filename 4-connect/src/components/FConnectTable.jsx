@@ -3,7 +3,7 @@ import {createBoard} from "../minmax/minMaxFConnect.js";
 import {useEffect, useState} from "react";
 import {useStateContext} from "../hooks/useStateContext.jsx";
 
-function FConnectTable({starterPlayer, boardView, setBoardView}) {
+function FConnectTable({boardView, setBoardView}) {
     const [winner, setWinner] = useState(0);
     const {dispatchScore} = useStateContext();
 
@@ -35,7 +35,7 @@ function FConnectTable({starterPlayer, boardView, setBoardView}) {
                 <tr key={r}>
                     {[0, 1, 2, 3, 4, 5, 6].map((c) => {
                         return (<>
-                            <FConnectCell starterPlayer={starterPlayer} indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView} />
+                            <FConnectCell indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView} />
                         </>);
                     })}
                 </tr>
