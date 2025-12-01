@@ -1,25 +1,19 @@
-// Connect4 Minimax with Alpha-Beta pruning (JavaScript)
-// Standard board: 6 rows x 7 columns
-
 const ROWS = 6;
 const COLS = 7;
 const EMPTY = 0;
-const PLAYER = 1;   // AI
-const OPPONENT = 2; // Human (or other AI)
+const PLAYER = 1;
+const OPPONENT = 2;
 
-// Create empty board
 function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY));
 }
 
-// Return list of valid column indices (0..6) where a move can be made
 function getValidLocations(board) {
     const valid = [];
     for (let c = 0; c < COLS; c++) if (board[0][c] === EMPTY) valid.push(c);
     return valid;
 }
 
-// Drop a piece in column for player; returns row index where placed or -1 if full
 function dropPiece(board, col, piece) {
     for (let r = ROWS - 1; r >= 0; r--) {
         if (board[r][col] === EMPTY) {
@@ -30,14 +24,11 @@ function dropPiece(board, col, piece) {
     return -1;
 }
 
-// Undo piece placed at (row, col)
 function removePiece(board, row, col) {
     board[row][col] = EMPTY;
 }
 
-// Check if last move created a win for 'piece'
 function winningMove(board, piece) {
-    // horizontal
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             if (
@@ -49,7 +40,6 @@ function winningMove(board, piece) {
         }
     }
 
-    // vertical
     for (let c = 0; c < COLS; c++) {
         for (let r = 0; r < ROWS - 3; r++) {
             if (
@@ -61,7 +51,6 @@ function winningMove(board, piece) {
         }
     }
 
-    // positively sloped diagonal
     for (let r = 0; r < ROWS - 3; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             if (
@@ -73,7 +62,6 @@ function winningMove(board, piece) {
         }
     }
 
-    // negatively sloped diagonal
     for (let r = 3; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             if (
@@ -88,13 +76,6 @@ function winningMove(board, piece) {
     return false;
 }
 
-// Check if board is full
-function isBoardFull(board) {
-    for (let c = 0; c < COLS; c++) if (board[0][c] === EMPTY) return false;
-    return true;
-}
-
-// Score a window of 4 cells for heuristic
 function evaluateWindow(window, piece) {
     const oppPiece = piece === PLAYER ? OPPONENT : PLAYER;
     let score = 0;
@@ -106,102 +87,77 @@ function evaluateWindow(window, piece) {
     else if (countPiece === 3 && countEmpty === 1) score += 100;
     else if (countPiece === 2 && countEmpty === 2) score += 10;
 
-    if (countOpp === 3 && countEmpty === 1) score -= 80; // block opponent
-    else if (countOpp === 2 && countEmpty === 2) score -= 5;
+    if (countOpp === 3 && countEmpty === 1) score -= 500;
+    else if (countOpp === 2 && countEmpty === 2) score -= 50;
 
     return score;
 }
 
-// Heuristic evaluation of the board for 'piece' (higher is better for piece)
 function scorePosition(board, piece) {
     let score = 0;
+    const mid = Math.floor(COLS / 2);
+    for (let r = 0; r < ROWS; r++){
+        if (board[r][mid] === piece) score += 6;
+    }
 
-    // Center column preference
-    const centerArray = [];
-    for (let r = 0; r < ROWS; r++) centerArray.push(board[r][Math.floor(COLS / 2)]);
-    const centerCount = centerArray.filter((v) => v === piece).length;
-    score += centerCount * 6;
-
-    // Horizontal windows
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
-            const window = [board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]];
-            score += evaluateWindow(window, piece);
+            score += evaluateWindow([board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]], piece);
         }
     }
 
-    // Vertical windows
     for (let c = 0; c < COLS; c++) {
         for (let r = 0; r < ROWS - 3; r++) {
-            const window = [board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]];
-            score += evaluateWindow(window, piece);
+            score += evaluateWindow([board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]], piece);
         }
     }
 
-    // Positive diagonal windows
     for (let r = 0; r < ROWS - 3; r++) {
         for (let c = 0; c < COLS - 3; c++) {
-            const window = [
-                board[r][c],
-                board[r + 1][c + 1],
-                board[r + 2][c + 2],
-                board[r + 3][c + 3],
-            ];
-            score += evaluateWindow(window, piece);
+            score += evaluateWindow([board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3]], piece);
         }
     }
 
-    // Negative diagonal windows
     for (let r = 3; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
-            const window = [
-                board[r][c],
-                board[r - 1][c + 1],
-                board[r - 2][c + 2],
-                board[r - 3][c + 3],
-            ];
-            score += evaluateWindow(window, piece);
+            score += evaluateWindow([board[r][c], board[r - 1][c + 1], board[r - 2][c + 2], board[r - 3][c + 3]], piece);
         }
     }
 
     return score;
 }
 
-// Check terminal node: win or draw
-function isTerminalNode(board) {
-    return (
-        winningMove(board, PLAYER) ||
-        winningMove(board, OPPONENT) ||
-        getValidLocations(board).length === 0
-    );
+const cache = new Map();
+function boardToKey(board, depth, maximizingPlayer) {
+    return board.flat().join('') + '_' + depth + '_' + (maximizingPlayer ? '1' : '0');
 }
 
-// Minimax with alpha-beta pruning
-// Returns an object { column, score }
 function minimax(board, depth, alpha, beta, maximizingPlayer) {
-    const validLocations = getValidLocations(board);
-    const isTerminal = isTerminalNode(board);
+    const key = boardToKey(board, depth, maximizingPlayer);
+    if (cache.has(key)) return cache.get(key);
 
-    if (depth === 0 || isTerminal) {
-        if (isTerminal) {
-            if (winningMove(board, PLAYER)) {
-                return { column: null, score: 1e9 }; // very large positive
-            } else if (winningMove(board, OPPONENT)) {
-                return { column: null, score: -1e9 }; // very large negative
-            } else {
-                return { column: null, score: 0 }; // draw
-            }
-        } else {
-            // depth === 0
-            const sc = scorePosition(board, PLAYER);
-            return { column: null, score: sc };
-        }
+    const validLocations = getValidLocations(board);
+
+    if (winningMove(board, PLAYER)) {
+        return {column: null, score: 1e9};
+    }
+    if (winningMove(board, OPPONENT)) {
+        return {column: null, score: -1e9};
+    }
+    if (validLocations.length === 0) {
+        return {column: null, score: 0};
     }
 
+    if (depth === 0){
+        const sc = scorePosition(board, PLAYER);
+        return { column: null, score: sc };
+    }
+    let value;
+    let bestCol;
+
     if (maximizingPlayer) {
-        let value = -Infinity;
-        let bestCol = validLocations[Math.floor(Math.random() * validLocations.length)]; // fallback
-        // Optional move ordering: prefer center moves first (improves pruning)
+        value = -Infinity;
+        bestCol = validLocations[0];
         validLocations.sort((a, b) => Math.abs(b - Math.floor(COLS / 2)) - Math.abs(a - Math.floor(COLS / 2)));
         for (const col of validLocations) {
             const row = dropPiece(board, col, PLAYER);
@@ -212,12 +168,11 @@ function minimax(board, depth, alpha, beta, maximizingPlayer) {
                 bestCol = col;
             }
             alpha = Math.max(alpha, value);
-            if (alpha >= beta) break; // alpha-beta prune
+            if (alpha >= beta) break;
         }
-        return { column: bestCol, score: value };
     } else {
-        let value = Infinity;
-        let bestCol = validLocations[Math.floor(Math.random() * validLocations.length)];
+        value = Infinity;
+        bestCol = validLocations[0];
         validLocations.sort((a, b) => Math.abs(a - Math.floor(COLS / 2)) - Math.abs(b - Math.floor(COLS / 2)));
         for (const col of validLocations) {
             const row = dropPiece(board, col, OPPONENT);
@@ -228,43 +183,23 @@ function minimax(board, depth, alpha, beta, maximizingPlayer) {
                 bestCol = col;
             }
             beta = Math.min(beta, value);
-            if (alpha >= beta) break; // prune
+            if (alpha >= beta) break;
         }
-        return { column: bestCol, score: value };
     }
+
+    const result = {column: bestCol, score: value};
+    cache.set(key, result);
+    return result;
 }
 
-// Public function to get best move for the AI (PLAYER)
-// depth: search depth (typical values: 4..8 depending on speed)
-function getBestMove(board, depth = 5) {
-    const result = minimax(board, depth, -Infinity, Infinity, true);
-    return result.column;
+function getBestMove(board, depth ) {
+    return minimax(board, depth, -Infinity, Infinity, true).column;
 }
-
-/* ---------------------------
-Example usage:
-
-const board = createBoard();
-// simulate moves (dropPiece(board, col, PLAYER or OPPONENT))
-dropPiece(board, 3, OPPONENT);
-dropPiece(board, 3, PLAYER);
-dropPiece(board, 2, OPPONENT);
-
-// Ask AI to pick best column with depth 5:
-const aiMove = getBestMove(board, 5);
-console.log("AI chooses column:", aiMove);
-
-Note: Depth 5-6 is a good balance; increase depth for stronger play but it's exponential.
----------------------------- */
 
 export {
     createBoard,
     dropPiece,
-    removePiece,
     getValidLocations,
     winningMove,
-    getBestMove,
-    PLAYER,
-    OPPONENT,
-    EMPTY
-}
+    getBestMove
+};

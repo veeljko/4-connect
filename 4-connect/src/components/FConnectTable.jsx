@@ -1,11 +1,11 @@
 import FConnectCell from "./FConnectCell.jsx"
 import {createBoard} from "../minmax/minMaxFConnect.js";
 import {useEffect, useState} from "react";
-import {useScoreContext} from "../hooks/useScoreContext.jsx";
+import {useStateContext} from "../hooks/useStateContext.jsx";
 
-function FConnectTable({difficulty, starterPlayer, boardView, setBoardView}) {
+function FConnectTable({starterPlayer, boardView, setBoardView}) {
     const [winner, setWinner] = useState(0);
-    const {dispatchScore} = useScoreContext();
+    const {dispatchScore} = useStateContext();
 
     useEffect( () => {
         //console.log(boardView)
@@ -18,11 +18,6 @@ function FConnectTable({difficulty, starterPlayer, boardView, setBoardView}) {
                 dispatchScore({
                     type: "O_WIN",
                 })
-            }
-            if (winner === 1) console.log("X win");
-            else console.log("O win");
-            for (let i = 0; i < 6; i++) {
-                console.log(i + " : " + boardView[i].join(' '));
             }
 
             setBoardView(createBoard());
@@ -40,7 +35,7 @@ function FConnectTable({difficulty, starterPlayer, boardView, setBoardView}) {
                 <tr key={r}>
                     {[0, 1, 2, 3, 4, 5, 6].map((c) => {
                         return (<>
-                            <FConnectCell starterPlayer={starterPlayer} difficulty={difficulty} setWinner={setWinner} indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView} />
+                            <FConnectCell starterPlayer={starterPlayer} indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView} />
                         </>);
                     })}
                 </tr>

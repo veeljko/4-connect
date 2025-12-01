@@ -1,10 +1,14 @@
 import {dropPiece} from "../minmax/minMaxFConnect.js";
 import {getBestMove} from "../minmax/minMaxFConnect.js";
 import {winningMove} from "../minmax/minMaxFConnect.js";
+import {useStateContext} from "../hooks/useStateContext.jsx";
 
-function FConnectCell({starterPlayer ,difficulty, indRow, indCol, boardView, setBoardView, setWinner}) {
-    const depth = difficulty === "easy" ? 7 : 9;
-    let player = boardView[indRow][indCol] === 0 ? "EMPTY" : boardView[indRow][indCol] === 1 ? "PLAYER" : "BOT"
+function FConnectCell({indRow, indCol, boardView, setBoardView}) {
+    const {state, dispatch} = useStateContext();
+    const depth = state.difficulty === "easy" ? 7 : 9;
+    const player = boardView[indRow][indCol] === 0 ? "EMPTY" : boardView[indRow][indCol] === 1 ? "PLAYER" : "BOT"
+    const color = player === "BOT" ? "red-800" : player === "PLAYER" ? "blue-800" : "white";
+
 
     function botMove(){
         const bestMove = getBestMove(board, depth);
@@ -32,35 +36,28 @@ function FConnectCell({starterPlayer ,difficulty, indRow, indCol, boardView, set
 
     const board = boardView;
     function handleClick(){
+        if (state.isP1Winner || state.isP2Winner) return;
         if (userMove() === -1) return;
         if (winningMove(board, 1)) {
-            setWinner(1);
+            dispatch({
+                type: "P1WIN"
+            });
             return;
         }
 
         botMove();
         if (winningMove(board, 2)) {
-            setWinner(2);
+            dispatch({
+                type: "P2WIN"
+            })
         }
     }
 
     return (<>
-        {player === "BOT" ?
-            <td className="bg-red-800 rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
-            onClick={handleClick}>
 
+            <td className={`bg-${color} rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer`}
+            onClick={handleClick}>
             </td>
-            :
-        player === "PLAYER" ?
-            <td className="bg-blue-800 rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
-            onClick={handleClick}>
-
-            </td>
-        :
-            <td className="bg-white rounded-4xl  w-10 h-10 text-center align-middle cursor-pointer"
-            onClick={handleClick}>
-
-            </td>}
     </>);
 }
 
