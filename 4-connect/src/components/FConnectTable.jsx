@@ -35,7 +35,7 @@ function FConnectTable({boardView, setBoardView}) {
                 <tr key={r}>
                     {[0, 1, 2, 3, 4, 5, 6].map((c) => {
                         return (<>
-                            <FConnectCell indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView} />
+                            <FConnectCell indRow={r} indCol={c} boardView={boardView} setBoardView={setBoardView}/>
                         </>);
                     })}
                 </tr>

@@ -1,8 +1,8 @@
 const ROWS = 6;
 const COLS = 7;
 const EMPTY = 0;
-const PLAYER = 1;
-const OPPONENT = 2;
+const PLAYER = 2;
+const OPPONENT = 1;
 
 function createBoard() {
     return Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY));
@@ -99,31 +99,26 @@ function scorePosition(board, piece) {
     for (let r = 0; r < ROWS; r++){
         if (board[r][mid] === piece) score += 6;
     }
-
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             score += evaluateWindow([board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]], piece);
         }
     }
-
     for (let c = 0; c < COLS; c++) {
         for (let r = 0; r < ROWS - 3; r++) {
             score += evaluateWindow([board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]], piece);
         }
     }
-
     for (let r = 0; r < ROWS - 3; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             score += evaluateWindow([board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3]], piece);
         }
     }
-
     for (let r = 3; r < ROWS; r++) {
         for (let c = 0; c < COLS - 3; c++) {
             score += evaluateWindow([board[r][c], board[r - 1][c + 1], board[r - 2][c + 2], board[r - 3][c + 3]], piece);
         }
     }
-
     return score;
 }
 
@@ -135,7 +130,6 @@ function boardToKey(board, depth, maximizingPlayer) {
 function minimax(board, depth, alpha, beta, maximizingPlayer) {
     const key = boardToKey(board, depth, maximizingPlayer);
     if (cache.has(key)) return cache.get(key);
-
     const validLocations = getValidLocations(board);
 
     if (winningMove(board, PLAYER)) {
@@ -147,18 +141,15 @@ function minimax(board, depth, alpha, beta, maximizingPlayer) {
     if (validLocations.length === 0) {
         return {column: null, score: 0};
     }
-
     if (depth === 0){
         const sc = scorePosition(board, PLAYER);
         return { column: null, score: sc };
     }
-    let value;
-    let bestCol;
 
+    let value = (maximizingPlayer ? -Infinity : Infinity);
+    let bestCol = validLocations[0];
+    validLocations.sort((a, b) => Math.abs(b - Math.floor(COLS / 2)) - Math.abs(a - Math.floor(COLS / 2)));
     if (maximizingPlayer) {
-        value = -Infinity;
-        bestCol = validLocations[0];
-        validLocations.sort((a, b) => Math.abs(b - Math.floor(COLS / 2)) - Math.abs(a - Math.floor(COLS / 2)));
         for (const col of validLocations) {
             const row = dropPiece(board, col, PLAYER);
             const newScore = minimax(board, depth - 1, alpha, beta, false).score;
@@ -170,10 +161,8 @@ function minimax(board, depth, alpha, beta, maximizingPlayer) {
             alpha = Math.max(alpha, value);
             if (alpha >= beta) break;
         }
-    } else {
-        value = Infinity;
-        bestCol = validLocations[0];
-        validLocations.sort((a, b) => Math.abs(a - Math.floor(COLS / 2)) - Math.abs(b - Math.floor(COLS / 2)));
+    }
+    else {
         for (const col of validLocations) {
             const row = dropPiece(board, col, OPPONENT);
             const newScore = minimax(board, depth - 1, alpha, beta, true).score;
@@ -186,13 +175,12 @@ function minimax(board, depth, alpha, beta, maximizingPlayer) {
             if (alpha >= beta) break;
         }
     }
-
     const result = {column: bestCol, score: value};
     cache.set(key, result);
     return result;
 }
 
-function getBestMove(board, depth ) {
+function getBestMove(board, depth) {
     return minimax(board, depth, -Infinity, Infinity, true).column;
 }
 

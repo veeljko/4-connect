@@ -7,7 +7,6 @@ import ChoosePlayer from "./ChosePlayer.jsx";
 import FConnectTable from "./FConnectTable.jsx";
 
 
-
 function MainPage(){
     const {state, dispatch} = useStateContext();
     const [boardView, setBoardView] = useState(createBoard());
